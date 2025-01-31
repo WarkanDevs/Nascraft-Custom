@@ -74,8 +74,10 @@ public class MarketManager {
             BufferedImage image = ImagesManager.getInstance().getImage(identifier);
 
             if (image == null) {
-                Nascraft.getInstance().getLogger().warning("No image found for item: " + identifier);
-                continue;
+                Nascraft.getInstance().getLogger().warning("No image found for item: " + identifier + ", using empty image to allow registration of this item in the Market...");
+
+                // continue; -- Instead of failing registration in the Market simply make an empty image as fallback...
+                image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
             }
 
             Item item = new Item(

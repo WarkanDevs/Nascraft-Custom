@@ -48,7 +48,7 @@ public class ImagesManager {
                 if (input != null) {
                     image = ImageIO.read(input);
                 } else {
-                    Nascraft.getInstance().getLogger().info("Unable to find image: " + imageName);
+                    Nascraft.getInstance().getLogger().info("Unable to find image: " + imageName + ", path: " + imagePath);
                 }
             } catch (IOException e) {
                 Nascraft.getInstance().getLogger().info("Unable to read image: " + imageName);
