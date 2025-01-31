@@ -291,14 +291,14 @@ public class EditItemMenu {
         inventory.setItem(7,
                 getItemStackOfOption(Material.WATER_BUCKET,
                         "Low Price - Hard Limit",
-                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + hardLimitLowPrice,
+                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + (hardLimitLowPrice == 0 ? ChatColor.RED + "DISABLED" : hardLimitLowPrice),
                                 "",
                                 ChatColor.GREEN + "" + ChatColor.BOLD + "CLICK TO CHANGE")
                 ));
         inventory.setItem(8,
                 getItemStackOfOption(Material.POWDER_SNOW_BUCKET,
                         "Top Price - Hard Limit",
-                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + hardLimitTopPrice,
+                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + (hardLimitTopPrice == 0 ? ChatColor.RED + "DISABLED" : hardLimitTopPrice),
                                 "",
                                 ChatColor.GREEN + "" + ChatColor.BOLD + "CLICK TO CHANGE")
                 ));

@@ -218,6 +218,8 @@ public class MarketEditor {
                             ChatColor.GRAY + "Noise Intensity: " + ChatColor.GREEN + item.getPrice().getNoiseIntensity(),
                             ChatColor.GRAY + "Support: " + (item.getPrice().getSupport() == 0 ? ChatColor.RED + "DISABLED" : BukkitComponentSerializer.legacy().serialize(support)),
                             ChatColor.GRAY + "Resistance: " + (item.getPrice().getResistance() == 0 ? ChatColor.RED + "DISABLED" : BukkitComponentSerializer.legacy().serialize(resistance)),
+                            ChatColor.GRAY + "Hard Limit Low Price: " + (item.getPrice().getHardLimitLowPrice() == 0 ? ChatColor.RED + "DISABLED" : item.getPrice().getHardLimitLowPrice()),
+                            ChatColor.GRAY + "Hard Limit Top Price: " + (item.getPrice().getHardLimitTopPrice() == 0 ? ChatColor.RED + "DISABLED" : item.getPrice().getHardLimitTopPrice()),
                             " ",
                             ChatColor.GREEN + "§lCLICK TO EDIT"
                     ));
