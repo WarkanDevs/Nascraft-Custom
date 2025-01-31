@@ -394,7 +394,9 @@ public class EditItemMenu {
                     elasticity,
                     noiseIntensity,
                     support,
-                    resistance
+                    resistance,
+                    hardLimitLowPrice,
+                    hardLimitTopPrice
             );
 
             if (!prevCategory.getIdentifier().equals(category.getIdentifier())) {

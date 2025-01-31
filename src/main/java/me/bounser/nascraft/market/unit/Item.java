@@ -380,13 +380,15 @@ public class Item {
 
     public void setCategory(Category category) { this.category = category; }
 
-    public void changeProperties(double initialPrice, String alias, float elasticity, float noiseSensibility, double support, double resistance) {
+    public void changeProperties(double initialPrice, String alias, float elasticity, float noiseSensibility, double support, double resistance, double hardLimitLowPrice, double hardLimitTopPrice) {
 
         price.setInitialValue(initialPrice)
                 .setElasticity(elasticity)
                 .setNoiseIntensity(noiseSensibility)
                 .setSupport(support)
-                .setResistance(resistance);
+                .setResistance(resistance)
+                .setHardLimitLowPrice(hardLimitLowPrice)
+                .setHardLimitTopPrice(hardLimitTopPrice);
 
         this.alias = alias;
     }

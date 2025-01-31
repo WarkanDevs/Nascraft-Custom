@@ -1,5 +1,6 @@
 package me.bounser.nascraft.market.unit;
 
+import me.bounser.nascraft.commands.admin.marketeditor.edit.item.EditItemMenu;
 import me.bounser.nascraft.config.Config;
 import me.bounser.nascraft.formatter.RoundUtils;
 
@@ -410,6 +411,8 @@ public class Price {
     public Price setNoiseIntensity(float noiseIntensity) { this.noiseIntensity = noiseIntensity * Config.getInstance().getNoiseMultiplier(); return this; }
     public Price setSupport(double support) { this.support = support; return this; }
     public Price setResistance(double resistance) { this.resistance = resistance; return this; }
+    public Price setHardLimitLowPrice(double hardLimitLowPrice) { this.hardLimitLowPrice = hardLimitLowPrice; return this; }
+    public Price setHardLimitTopPrice(double hardLimitTopPrice) { this.hardLimitTopPrice = hardLimitTopPrice; return this; }
 
     public static float roundToDecimals(double value, int decimals) {
         BigDecimal bd = new BigDecimal(Double.toString(value));
