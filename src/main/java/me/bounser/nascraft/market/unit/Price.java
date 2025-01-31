@@ -208,6 +208,13 @@ public class Price {
 
     public boolean canStockChange(float change, boolean buy) {
 
+        boolean disable = true;
+
+        // We are not interested in this feature... sadly, it is not configurable :/
+        if (disable) {
+            return true;
+        }
+
         float newStock = stock + change;
 
         if (!buy) return !(newStock > lowerStockThreshold);
