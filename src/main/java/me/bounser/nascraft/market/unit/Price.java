@@ -399,7 +399,13 @@ public class Price {
             cost += fictitiousValue * excess;
         }
 
-        return roundToDecimals(cost*tax, precission);
+        if (stockChange > 0) {
+            // Sell
+            return roundToDecimals(Math.max(cost*tax, hardLimitLowPrice), precission);
+        } else {
+            // Buy
+            return roundToDecimals(Math.min(cost*tax, hardLimitTopPrice), precission);
+        }
     }
 
     public float getBuyTaxMultiplier() { return taxBuy; }
