@@ -401,10 +401,18 @@ public class Price {
 
         if (stockChange > 0) {
             // Sell
-            return roundToDecimals(Math.max(cost*tax, hardLimitLowPrice), precission);
+            if (hardLimitLowPrice != 0) {
+                return roundToDecimals(Math.max(cost * tax, hardLimitLowPrice), precission);
+            } else {
+                return roundToDecimals(cost * tax, precission);
+            }
         } else {
             // Buy
-            return roundToDecimals(Math.min(cost*tax, hardLimitTopPrice), precission);
+            if (hardLimitTopPrice != 0) {
+                return roundToDecimals(Math.min(cost * tax, hardLimitTopPrice), precission);
+            } else {
+                return roundToDecimals(cost * tax, precission);
+            }
         }
     }
 
