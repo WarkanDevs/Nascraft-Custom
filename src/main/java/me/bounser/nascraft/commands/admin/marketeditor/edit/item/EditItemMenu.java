@@ -37,6 +37,8 @@ public class EditItemMenu {
     private float noiseIntensity;
     private double support;
     private double resistance;
+    private double hardLimitLowPrice;
+    private double hardLimitTopPrice;
 
     private Category prevCategory;
     private Category category;
@@ -60,6 +62,8 @@ public class EditItemMenu {
         support = 0;
         resistance = 0;
         currency = CurrenciesManager.getInstance().getDefaultCurrency();
+        hardLimitLowPrice = 0;
+        hardLimitTopPrice = 0;
 
         prevCategory = MarketManager.getInstance().getCategories().get(0);
         category = MarketManager.getInstance().getCategories().get(0);
@@ -80,6 +84,8 @@ public class EditItemMenu {
         support = item.getPrice().getSupport();
         resistance = item.getPrice().getResistance();
         currency = item.getCurrency();
+        hardLimitLowPrice = item.getPrice().getHardLimitLowPrice();
+        hardLimitTopPrice = item.getPrice().getHardLimitTopPrice();
 
         prevCategory = item.getCategory();
         category = item.getCategory();
@@ -281,6 +287,21 @@ public class EditItemMenu {
                                 "",
                                 ChatColor.GREEN + "" + ChatColor.BOLD + "CLICK TO CHANGE")
         ));
+
+        inventory.setItem(7,
+                getItemStackOfOption(Material.WATER_BUCKET,
+                        "Low Price - Hard Limit",
+                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + hardLimitLowPrice,
+                                "",
+                                ChatColor.GREEN + "" + ChatColor.BOLD + "CLICK TO CHANGE")
+                ));
+        inventory.setItem(8,
+                getItemStackOfOption(Material.POWDER_SNOW_BUCKET,
+                        "Top Price - Hard Limit",
+                        Arrays.asList(ChatColor.GRAY + "Current: " + ChatColor.GOLD + hardLimitTopPrice,
+                                "",
+                                ChatColor.GREEN + "" + ChatColor.BOLD + "CLICK TO CHANGE")
+                ));
     }
 
     public static ItemStack getItemStackOfOption(Material material, String displayName, List<String> value) {
@@ -301,6 +322,8 @@ public class EditItemMenu {
     public void setResistance(float resistance) { this.resistance = resistance; }
     public void setCategory(Category category) { this.category = category; }
     public void setCurrency(Currency currency) { this.currency = currency; }
+    public void setHardLimitLowPrice(float value) { this.hardLimitLowPrice = value; }
+    public void setHardLimitTopPrice(float value) { this.hardLimitTopPrice = value; }
 
     public void save() {
 
@@ -329,6 +352,12 @@ public class EditItemMenu {
 
         if (resistance != 0)
             items.set("items." + identifier + ".resistance", resistance);
+
+        if (hardLimitTopPrice != 0)
+            items.set("items." + identifier + ".hard-limit-top-price", hardLimitTopPrice);
+
+        if (hardLimitLowPrice != 0)
+            items.set("items." + identifier + ".hard-limit-low-price", hardLimitLowPrice);
 
         if (itemStack != null && itemStack.getType() != Material.AIR) {
             if (item != null) item.setItemStack(itemStack);
@@ -411,5 +440,4 @@ public class EditItemMenu {
 
         MarketEditorManager.getInstance().getMarketEditorFromPlayer(player).open();
     }
-
 }

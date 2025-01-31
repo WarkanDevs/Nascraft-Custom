@@ -85,7 +85,10 @@ public class Item {
                 Config.getInstance().getElasticity(identifier),
                 Config.getInstance().getSupport(identifier),
                 Config.getInstance().getResistance(identifier),
-                Config.getInstance().getNoiseIntensity(identifier));
+                Config.getInstance().getNoiseIntensity(identifier),
+                Config.getInstance().getHardLimitTopPrice(identifier),
+                Config.getInstance().getHardLimitLowPrice(identifier)
+        );
 
         this.icon = image;
 

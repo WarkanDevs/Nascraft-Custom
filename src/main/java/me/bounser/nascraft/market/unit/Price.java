@@ -20,6 +20,9 @@ public class Price {
     private double topLimit;
     private double lowLimit;
 
+    private double hardLimitTopPrice;
+    private double hardLimitLowPrice;
+
     private double upperStockThreshold;
     private double lowerStockThreshold;
 
@@ -63,9 +66,12 @@ public class Price {
     private float yearChange;
     private float allChange;
 
-    public Price(Item item, float initialValue, float elasticity, float support, float resistance, float noiseIntensity) {
+    public Price(Item item, float initialValue, float elasticity, float support, float resistance, float noiseIntensity, double hardLimitTopPrice, double hardLimitLowPrice) {
 
         this.item = item;
+
+        this.hardLimitLowPrice = hardLimitLowPrice;
+        this.hardLimitTopPrice = hardLimitTopPrice;
 
         updateValue();
         previousValue = value;
@@ -300,6 +306,13 @@ public class Price {
     public void updateValue() {
 
         value = (float) (initialValue * Math.exp(-0.0005 * elasticity * stock));
+
+        if (hardLimitLowPrice != 0 && value < hardLimitLowPrice) {
+            value = Math.max(hardLimitLowPrice, value);
+        } else if (hardLimitTopPrice != 0 && value > hardLimitTopPrice) {
+            value = Math.min(hardLimitTopPrice, value);
+        }
+
         enforceLimits();
         updateLimits();
 
@@ -408,4 +421,11 @@ public class Price {
         return (float) (Math.log(value / initialValue) / (-0.0005 * elasticity));
     }
 
+    public double getHardLimitLowPrice() {
+        return hardLimitLowPrice;
+    }
+
+    public double getHardLimitTopPrice() {
+        return hardLimitTopPrice;
+    }
 }

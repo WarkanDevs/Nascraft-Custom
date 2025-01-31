@@ -693,6 +693,20 @@ public class Config {
         return (float) config.getDouble("price-options.noise.default-intensity");
     }
 
+    public double getHardLimitTopPrice(String identifier) {
+        if (items.contains("items." + identifier + ".hard-limit-top-price")) {
+            return items.getDouble("items." + identifier + ".hard-limit-top-price");
+        }
+        return 0;
+    }
+
+    public double getHardLimitLowPrice(String identifier) {
+        if (items.contains("items." + identifier + ".hard-limit-low-price")) {
+            return items.getDouble("items." + identifier + ".hard-limit-low-price");
+        }
+        return 0;
+    }
+
     public float getNoiseMultiplier() {
         if (config.contains("price-options.noise.intensity-multiplier")) {
             return (float) config.getDouble("price-options.noise.intensity-multiplier");

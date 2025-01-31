@@ -191,6 +191,24 @@ public class EditItemMenuListener implements Listener {
                         .plugin(Nascraft.getInstance())
                         .open(player);
                 break;
+            case 7:
+                openAnvil(player,
+                    ChatColor.LIGHT_PURPLE + "Hard limit set for low price!",
+                    "Low price hard limit...",
+                    "Low price hard limit",
+                    "lowpricehardlimit"
+                );
+
+                break;
+            case 8:
+                openAnvil(player,
+                        ChatColor.LIGHT_PURPLE + "Hard limit set for top price!",
+                        "Top price hard limit...",
+                        "Top price hard limit",
+                        "toppricehardlimit"
+                );
+
+                break;
         }
     }
 
@@ -226,6 +244,12 @@ public class EditItemMenuListener implements Listener {
                                 break;
                             case "resistance":
                                 EditorManager.getInstance().getEditItemMenuFromPlayer(player).setResistance(value);
+                                break;
+                            case "lowpricehardlimit":
+                                EditorManager.getInstance().getEditItemMenuFromPlayer(player).setHardLimitLowPrice(value);
+                                break;
+                            case "toppricehardlimit":
+                                EditorManager.getInstance().getEditItemMenuFromPlayer(player).setHardLimitTopPrice(value);
                                 break;
 
                         }
