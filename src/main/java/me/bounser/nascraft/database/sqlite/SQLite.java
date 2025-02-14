@@ -753,12 +753,8 @@ public class SQLite implements Database {
     }
 
     private void ensureDatabaseConnectionIsOpen() throws SQLException {
-        // Thread-safe to guarantee only one attempt at same time
-        synchronized (this) {
-            // Try to open connection if not set or was closed for some reason
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection("jdbc:sqlite:" + PATH);
-            }
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection("jdbc:sqlite:" + PATH);
         }
     }
 

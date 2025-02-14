@@ -17,13 +17,13 @@ public class Alerts {
         try {
             String sql = "INSERT INTO alerts (day, userid, identifier, price) VALUES (?, ?, ?, ?);";
 
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setInt(1, NormalisedDate.getDays());
-            prep.setString(2, userid);
-            prep.setString(3, item.getIdentifier());
-            prep.setDouble(4, price);
-            prep.executeUpdate();
-
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setInt(1, NormalisedDate.getDays());
+                prep.setString(2, userid);
+                prep.setString(3, item.getIdentifier());
+                prep.setDouble(4, price);
+                prep.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -34,10 +34,11 @@ public class Alerts {
         try {
             String sql = "DELETE FROM alerts WHERE userid = ? AND identifier = ?;";
 
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setString(1, userid);
-            prep.setString(2, item.getIdentifier());
-            prep.executeUpdate();
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setString(1, userid);
+                prep.setString(2, item.getIdentifier());
+                prep.executeUpdate();
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -48,12 +49,14 @@ public class Alerts {
 
         try {
             String sql = "SELECT userid, identifier, price FROM alerts;";
-            PreparedStatement prep = connection.prepareStatement(sql);
-            ResultSet resultSet = prep.executeQuery();
 
-            while (resultSet.next())
-                DiscordAlerts.getInstance().setAlert(resultSet.getString("userid"), resultSet.getString("identifier"), resultSet.getDouble("price"));
+            try (PreparedStatement prep = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = prep.executeQuery()) {
 
+                    while (resultSet.next())
+                        DiscordAlerts.getInstance().setAlert(resultSet.getString("userid"), resultSet.getString("identifier"), resultSet.getDouble("price"));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -63,10 +66,10 @@ public class Alerts {
 
         try {
             String sql = "DELETE FROM alerts WHERE userid=?";
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setString(1, userId);
-            prep.executeUpdate();
-
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setString(1, userId);
+                prep.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

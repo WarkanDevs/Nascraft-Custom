@@ -16,40 +16,45 @@ public class PortfoliosLog {
 
         try {
             String sql1 = "SELECT contribution, amount, day FROM portfolios_log WHERE uuid=? AND identifier=? ORDER BY day DESC LIMIT 1;";
-            PreparedStatement prep1 =  connection.prepareStatement(sql1);
-            prep1.setString(1, uuid.toString());
-            prep1.setString(2, item.getIdentifier());
-            ResultSet resultSet = prep1.executeQuery();
+            try(PreparedStatement prep1 =  connection.prepareStatement(sql1)) {
+                prep1.setString(1, uuid.toString());
+                prep1.setString(2, item.getIdentifier());
+                try(ResultSet resultSet = prep1.executeQuery()) {
 
-            if (resultSet.next()) {
-                if (resultSet.getInt("day") == NormalisedDate.getDays()) {
-                    String sql2 = "UPDATE portfolios_log SET contribution=?, amount=? WHERE uuid=? AND identifier=? AND day=?;";
-                    PreparedStatement prep2 =  connection.prepareStatement(sql2);
-                    prep2.setDouble(1, item.getPrice().getValue()*amount + resultSet.getDouble("contribution"));
-                    prep2.setInt(2, amount + resultSet.getInt("amount"));
-                    prep2.setString(3, uuid.toString());
-                    prep2.setString(4, item.getIdentifier());
-                    prep2.setInt(5, NormalisedDate.getDays());
-                    prep2.executeUpdate();
-                } else {
-                    String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution, day) VALUES (?,?,?,?,?);";
-                    PreparedStatement prep2 = connection.prepareStatement(sql2);
-                    prep2.setString(1, uuid.toString());
-                    prep2.setString(2, item.getIdentifier());
-                    prep2.setInt(3, amount + resultSet.getInt("amount"));
-                    prep2.setDouble(4, item.getPrice().getValue()*amount + resultSet.getDouble("contribution"));
-                    prep2.setInt(5, NormalisedDate.getDays());
-                    prep2.executeUpdate();
+                    if (resultSet.next()) {
+                        if (resultSet.getInt("day") == NormalisedDate.getDays()) {
+                            String sql2 = "UPDATE portfolios_log SET contribution=?, amount=? WHERE uuid=? AND identifier=? AND day=?;";
+                            try(PreparedStatement prep2 = connection.prepareStatement(sql2)) {
+                                prep2.setDouble(1, item.getPrice().getValue() * amount + resultSet.getDouble("contribution"));
+                                prep2.setInt(2, amount + resultSet.getInt("amount"));
+                                prep2.setString(3, uuid.toString());
+                                prep2.setString(4, item.getIdentifier());
+                                prep2.setInt(5, NormalisedDate.getDays());
+                                prep2.executeUpdate();
+                            }
+                        } else {
+                            String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution, day) VALUES (?,?,?,?,?);";
+                            try(PreparedStatement prep2 = connection.prepareStatement(sql2)) {
+                                prep2.setString(1, uuid.toString());
+                                prep2.setString(2, item.getIdentifier());
+                                prep2.setInt(3, amount + resultSet.getInt("amount"));
+                                prep2.setDouble(4, item.getPrice().getValue() * amount + resultSet.getDouble("contribution"));
+                                prep2.setInt(5, NormalisedDate.getDays());
+                                prep2.executeUpdate();
+                            }
+                        }
+                    } else {
+                        String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution, day) VALUES (?,?,?,?,?);";
+                        try(PreparedStatement prep2 = connection.prepareStatement(sql2)) {
+                            prep2.setString(1, uuid.toString());
+                            prep2.setString(2, item.getIdentifier());
+                            prep2.setInt(3, amount);
+                            prep2.setDouble(4, item.getPrice().getValue() * amount);
+                            prep2.setInt(5, NormalisedDate.getDays());
+                            prep2.executeUpdate();
+                        }
+                    }
                 }
-            } else {
-                String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution, day) VALUES (?,?,?,?,?);";
-                PreparedStatement prep2 = connection.prepareStatement(sql2);
-                prep2.setString(1, uuid.toString());
-                prep2.setString(2, item.getIdentifier());
-                prep2.setInt(3, amount);
-                prep2.setDouble(4, item.getPrice().getValue()*amount);
-                prep2.setInt(5, NormalisedDate.getDays());
-                prep2.executeUpdate();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -60,41 +65,43 @@ public class PortfoliosLog {
 
         try {
             String sql1 = "SELECT contribution, amount, day FROM portfolios_log WHERE uuid=? AND identifier=? ORDER BY day DESC LIMIT 1;";
-            PreparedStatement prep1 =  connection.prepareStatement(sql1);
-            prep1.setString(1, uuid.toString());
-            prep1.setString(2, item.getIdentifier());
-            ResultSet resultSet = prep1.executeQuery();
+            try(PreparedStatement prep1 =  connection.prepareStatement(sql1)) {
+                prep1.setString(1, uuid.toString());
+                prep1.setString(2, item.getIdentifier());
+                try(ResultSet resultSet = prep1.executeQuery()) {
 
-            if (!resultSet.next()) return;
+                    if (!resultSet.next()) return;
 
-            if (resultSet.getInt("amount") == amount || resultSet.getInt("amount") < amount) {
-                String sql = "DELETE FROM portfolios_log WHERE uuid=? AND identifier=? AND day=?;";
-                PreparedStatement prep = connection.prepareStatement(sql);
-                prep.setString(1, uuid.toString());
-                prep.setString(2, item.getIdentifier());
-                prep.setInt(3, NormalisedDate.getDays());
-                prep.executeUpdate();
+                    if (resultSet.getInt("amount") == amount || resultSet.getInt("amount") < amount) {
+                        String sql = "DELETE FROM portfolios_log WHERE uuid=? AND identifier=? AND day=?;";
+                        try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                            prep.setString(1, uuid.toString());
+                            prep.setString(2, item.getIdentifier());
+                            prep.setInt(3, NormalisedDate.getDays());
+                            prep.executeUpdate();
+                        }
+                    } else if (resultSet.getInt("day") == NormalisedDate.getDays()) {
 
-            } else if (resultSet.getInt("day") == NormalisedDate.getDays()) {
-
-                String sql2 = "UPDATE portfolios_log SET amount=?, contribution=? WHERE uuid=? AND identifier=?;";
-                PreparedStatement prep2 =  connection.prepareStatement(sql2);
-                prep2.setInt(1, resultSet.getInt("amount") - amount);
-                prep2.setDouble(2, amount * resultSet.getDouble("contribution") / (float) resultSet.getInt("amount"));
-                prep2.setString(3, uuid.toString());
-                prep2.setString(4, item.getIdentifier());
-                prep2.executeUpdate();
-
-            } else {
-                String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution) VALUES (?,?,?);";
-                PreparedStatement prep2 =  connection.prepareStatement(sql2);
-                prep2.setString(1, uuid.toString());
-                prep2.setString(2, item.getIdentifier());
-                prep2.setInt(3, resultSet.getInt("amount") - amount);
-                prep2.setDouble(4, amount * resultSet.getDouble("contribution") / (float) resultSet.getInt("amount"));
-                prep2.executeUpdate();
+                        String sql2 = "UPDATE portfolios_log SET amount=?, contribution=? WHERE uuid=? AND identifier=?;";
+                        try(PreparedStatement prep2 = connection.prepareStatement(sql2)) {
+                            prep2.setInt(1, resultSet.getInt("amount") - amount);
+                            prep2.setDouble(2, amount * resultSet.getDouble("contribution") / (float) resultSet.getInt("amount"));
+                            prep2.setString(3, uuid.toString());
+                            prep2.setString(4, item.getIdentifier());
+                            prep2.executeUpdate();
+                        }
+                    } else {
+                        String sql2 = "INSERT INTO portfolios_log (uuid, identifier, amount, contribution) VALUES (?,?,?);";
+                        try(PreparedStatement prep2 = connection.prepareStatement(sql2)) {
+                            prep2.setString(1, uuid.toString());
+                            prep2.setString(2, item.getIdentifier());
+                            prep2.setInt(3, resultSet.getInt("amount") - amount);
+                            prep2.setDouble(4, amount * resultSet.getDouble("contribution") / (float) resultSet.getInt("amount"));
+                            prep2.executeUpdate();
+                        }
+                    }
+                }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -106,19 +113,20 @@ public class PortfoliosLog {
             HashMap<Integer, Double> dayAndContribution = new HashMap<>();
 
             String sql1 = "SELECT contribution, amount, day FROM portfolios_log WHERE uuid=? ORDER BY day DESC;";
-            PreparedStatement prep1 =  connection.prepareStatement(sql1);
-            prep1.setString(1, uuid.toString());
-            ResultSet resultSet = prep1.executeQuery();
+            try(PreparedStatement prep1 =  connection.prepareStatement(sql1)) {
+                prep1.setString(1, uuid.toString());
+                try(ResultSet resultSet = prep1.executeQuery()) {
+                    while (resultSet.next()) {
+                        int day = resultSet.getInt("day");
 
-            while (resultSet.next()) {
-                int day = resultSet.getInt("day");
+                        if (dayAndContribution.containsKey(day))
+                            dayAndContribution.put(day, dayAndContribution.get(day) + resultSet.getDouble("contribution"));
+                        else dayAndContribution.put(resultSet.getInt("day"), resultSet.getDouble("contribution"));
+                    }
 
-                if (dayAndContribution.containsKey(day)) dayAndContribution.put(day, dayAndContribution.get(day) + resultSet.getDouble("contribution"));
-                else dayAndContribution.put(resultSet.getInt("day"), resultSet.getDouble("contribution"));
+                    return dayAndContribution;
+                }
             }
-
-            return dayAndContribution;
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -130,33 +138,33 @@ public class PortfoliosLog {
             HashMap<Integer, HashMap<String, Integer>> dayAndComposition = new HashMap<>();
 
             String sql1 = "SELECT identifier, amount, day FROM portfolios_log WHERE uuid=? ORDER BY day DESC;";
-            PreparedStatement prep1 =  connection.prepareStatement(sql1);
-            prep1.setString(1, uuid.toString());
-            ResultSet resultSet = prep1.executeQuery();
+            try(PreparedStatement prep1 =  connection.prepareStatement(sql1)) {
+                prep1.setString(1, uuid.toString());
+                try(ResultSet resultSet = prep1.executeQuery()) {
+                    while (resultSet.next()) {
+                        String identifier = resultSet.getString("identifier");
+                        int day = resultSet.getInt("day");
+                        int amount = resultSet.getInt("amount");
 
-            while (resultSet.next()) {
-                String identifier = resultSet.getString("identifier");
-                int day = resultSet.getInt("day");
-                int amount = resultSet.getInt("amount");
+                        if (dayAndComposition.containsKey(day)) {
 
-                if (dayAndComposition.containsKey(day)) {
+                            HashMap<String, Integer> composition = dayAndComposition.get(day);
 
-                    HashMap<String, Integer> composition = dayAndComposition.get(day);
+                            composition.put(identifier, amount);
 
-                    composition.put(identifier, amount);
+                            dayAndComposition.put(day, composition);
 
-                    dayAndComposition.put(day, composition);
+                        } else {
+                            HashMap<String, Integer> composition = new HashMap<>();
 
-                } else {
-                    HashMap<String, Integer> composition = new HashMap<>();
+                            composition.put(identifier, amount);
 
-                    composition.put(identifier, amount);
-
-                    dayAndComposition.put(day, composition);
+                            dayAndComposition.put(day, composition);
+                        }
+                    }
+                    return dayAndComposition;
                 }
             }
-            return dayAndComposition;
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -166,16 +174,17 @@ public class PortfoliosLog {
 
         try {
             String sql = "SELECT MIN(day) AS first_day FROM portfolios_log WHERE uuid=?;";
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setString(1, uuid.toString());
-            ResultSet resultSet = prep.executeQuery();
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setString(1, uuid.toString());
+                try(ResultSet resultSet = prep.executeQuery()) {
 
-            if (resultSet.next()) {
-                return resultSet.getInt("first_day");
-            } else {
-                return NormalisedDate.getDays();
+                    if (resultSet.next()) {
+                        return resultSet.getInt("first_day");
+                    } else {
+                        return NormalisedDate.getDays();
+                    }
+                }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

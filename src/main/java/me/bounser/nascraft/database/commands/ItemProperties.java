@@ -16,36 +16,38 @@ public class ItemProperties {
         try {
             String sql = "SELECT stock FROM items WHERE identifier=?;";
 
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setString(1, item.getIdentifier());
-            ResultSet rs = prep.executeQuery();
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setString(1, item.getIdentifier());
+                try(ResultSet rs = prep.executeQuery()) {
 
-            if (rs.next()) {
-                String sqlReplace = "REPLACE INTO items (lastprice, lowest, highest, stock, taxes, identifier) VALUES (?, ?, ?, ?, ?, ?);";
-                PreparedStatement prepReplace = connection.prepareStatement(sqlReplace);
+                    if (rs.next()) {
+                        String sqlReplace = "REPLACE INTO items (lastprice, lowest, highest, stock, taxes, identifier) VALUES (?, ?, ?, ?, ?, ?);";
+                        PreparedStatement prepReplace = connection.prepareStatement(sqlReplace);
 
-                prepReplace.setDouble(1, item.getPrice().getValue());
-                prepReplace.setDouble(2, item.getPrice().getHistoricalLow());
-                prepReplace.setDouble(3, item.getPrice().getHistoricalHigh());
-                prepReplace.setDouble(4, item.getPrice().getStock());
-                prepReplace.setDouble(5, item.getCollectedTaxes());
+                        prepReplace.setDouble(1, item.getPrice().getValue());
+                        prepReplace.setDouble(2, item.getPrice().getHistoricalLow());
+                        prepReplace.setDouble(3, item.getPrice().getHistoricalHigh());
+                        prepReplace.setDouble(4, item.getPrice().getStock());
+                        prepReplace.setDouble(5, item.getCollectedTaxes());
 
-                prepReplace.setString(6, item.getIdentifier());
+                        prepReplace.setString(6, item.getIdentifier());
 
-                prepReplace.executeUpdate();
-            } else {
-                String sqlInsert = "INSERT INTO items (lastprice, lowest, highest, stock, taxes, identifier) VALUES (?, ?, ?, ?, ?, ?);";
-                PreparedStatement prepInsert = connection.prepareStatement(sqlInsert);
+                        prepReplace.executeUpdate();
+                    } else {
+                        String sqlInsert = "INSERT INTO items (lastprice, lowest, highest, stock, taxes, identifier) VALUES (?, ?, ?, ?, ?, ?);";
+                        PreparedStatement prepInsert = connection.prepareStatement(sqlInsert);
 
-                prepInsert.setDouble(1, item.getPrice().getValue());
-                prepInsert.setDouble(2, item.getPrice().getHistoricalLow());
-                prepInsert.setDouble(3, item.getPrice().getHistoricalHigh());
-                prepInsert.setDouble(4, item.getPrice().getStock());
-                prepInsert.setDouble(5, item.getCollectedTaxes());
+                        prepInsert.setDouble(1, item.getPrice().getValue());
+                        prepInsert.setDouble(2, item.getPrice().getHistoricalLow());
+                        prepInsert.setDouble(3, item.getPrice().getHistoricalHigh());
+                        prepInsert.setDouble(4, item.getPrice().getStock());
+                        prepInsert.setDouble(5, item.getCollectedTaxes());
 
-                prepInsert.setString(6, item.getIdentifier());
+                        prepInsert.setString(6, item.getIdentifier());
 
-                prepInsert.executeUpdate();
+                        prepInsert.executeUpdate();
+                    }
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -57,32 +59,34 @@ public class ItemProperties {
         try {
             String sql = "SELECT lowest, highest, stock, taxes FROM items WHERE identifier=?;";
 
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setString(1, item.getIdentifier());
-            ResultSet rs = prep.executeQuery();
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setString(1, item.getIdentifier());
+                try(ResultSet rs = prep.executeQuery()) {
 
-            if (rs.next()) {
-                item.getPrice().setStock(rs.getInt("stock"));
-                item.getPrice().setHistoricalHigh(rs.getFloat("highest"));
-                item.getPrice().setHistoricalLow(rs.getFloat("lowest"));
-                item.setCollectedTaxes(rs.getFloat("taxes"));
-            } else {
-                String sqlinsert = "INSERT INTO items (identifier, lastprice, lowest, highest, stock, taxes) VALUES (?,?,?,?,?,?);";
+                    if (rs.next()) {
+                        item.getPrice().setStock(rs.getInt("stock"));
+                        item.getPrice().setHistoricalHigh(rs.getFloat("highest"));
+                        item.getPrice().setHistoricalLow(rs.getFloat("lowest"));
+                        item.setCollectedTaxes(rs.getFloat("taxes"));
+                    } else {
+                        String sqlinsert = "INSERT INTO items (identifier, lastprice, lowest, highest, stock, taxes) VALUES (?,?,?,?,?,?);";
 
-                PreparedStatement insertPrep = connection.prepareStatement(sqlinsert);
-                insertPrep.setString(1, item.getIdentifier());
-                insertPrep.setFloat(2, Config.getInstance().getInitialPrice(item.getIdentifier()));
-                insertPrep.setFloat(3, Config.getInstance().getInitialPrice(item.getIdentifier()));
-                insertPrep.setFloat(4, Config.getInstance().getInitialPrice(item.getIdentifier()));
-                insertPrep.setFloat(5, 0);
-                insertPrep.setFloat(6, 0);
+                        PreparedStatement insertPrep = connection.prepareStatement(sqlinsert);
+                        insertPrep.setString(1, item.getIdentifier());
+                        insertPrep.setFloat(2, Config.getInstance().getInitialPrice(item.getIdentifier()));
+                        insertPrep.setFloat(3, Config.getInstance().getInitialPrice(item.getIdentifier()));
+                        insertPrep.setFloat(4, Config.getInstance().getInitialPrice(item.getIdentifier()));
+                        insertPrep.setFloat(5, 0);
+                        insertPrep.setFloat(6, 0);
 
-                item.getPrice().setStock(0);
-                item.getPrice().setHistoricalHigh(Config.getInstance().getInitialPrice(item.getIdentifier()));
-                item.getPrice().setHistoricalLow(Config.getInstance().getInitialPrice(item.getIdentifier()));
-                item.setCollectedTaxes(0);
+                        item.getPrice().setStock(0);
+                        item.getPrice().setHistoricalHigh(Config.getInstance().getInitialPrice(item.getIdentifier()));
+                        item.getPrice().setHistoricalLow(Config.getInstance().getInitialPrice(item.getIdentifier()));
+                        item.setCollectedTaxes(0);
 
-                insertPrep.executeUpdate();
+                        insertPrep.executeUpdate();
+                    }
+                }
             }
 
         } catch (SQLException e) {
@@ -94,18 +98,17 @@ public class ItemProperties {
 
         try {
             String selectSQL = "SELECT lastprice FROM items WHERE identifier = ?;";
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+                preparedStatement.setString(1, item.getIdentifier());
 
-            preparedStatement.setString(1, item.getIdentifier());
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return resultSet.getFloat("lastprice");
-            } else {
-                return Config.getInstance().getInitialPrice(item.getIdentifier());
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getFloat("lastprice");
+                    } else {
+                        return Config.getInstance().getInitialPrice(item.getIdentifier());
+                    }
+                }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -116,24 +119,25 @@ public class ItemProperties {
         try {
             String selectSQL = "SELECT stock, identifier FROM items;";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+            try(PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+                try(ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            while (resultSet.next()) {
+                    while (resultSet.next()) {
 
-                String identifier = resultSet.getString("identifier");
+                        String identifier = resultSet.getString("identifier");
 
-                Item item = MarketManager.getInstance().getItem(identifier);
+                        Item item = MarketManager.getInstance().getItem(identifier);
 
-                if (item == null) continue;
+                        if (item == null) continue;
 
-                if (item.isParent()) {
-                    item.getPrice().setStock(resultSet.getFloat("stock"));
+                        if (item.isParent()) {
+                            item.getPrice().setStock(resultSet.getFloat("stock"));
+                        }
+
+                    }
                 }
-
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -21,18 +21,19 @@ public class TradesLog {
     public static void saveTrade(Connection connection, Trade trade) {
         try {
             String selectSQL = "INSERT INTO trade_log (uuid, day, date, identifier, amount, value, buy, discord) VALUES (?,?,?,?,?,?,?,?);";
-            PreparedStatement statement = connection.prepareStatement(selectSQL);
+            try(PreparedStatement statement = connection.prepareStatement(selectSQL)) {
 
-            statement.setString(1, trade.getUuid().toString());
-            statement.setInt(2, NormalisedDate.getDays());
-            statement.setString(3, NormalisedDate.formatDateTime(LocalDateTime.now()));
-            statement.setString(4, trade.getItem().getIdentifier());
-            statement.setInt(5, trade.getAmount());
-            statement.setFloat(6, RoundUtils.round(trade.getValue()));
-            statement.setBoolean(7, trade.isBuy());
-            statement.setBoolean(8, trade.throughDiscord());
+                statement.setString(1, trade.getUuid().toString());
+                statement.setInt(2, NormalisedDate.getDays());
+                statement.setString(3, NormalisedDate.formatDateTime(LocalDateTime.now()));
+                statement.setString(4, trade.getItem().getIdentifier());
+                statement.setInt(5, trade.getAmount());
+                statement.setFloat(6, RoundUtils.round(trade.getValue()));
+                statement.setBoolean(7, trade.isBuy());
+                statement.setBoolean(8, trade.throughDiscord());
 
-            statement.executeUpdate();
+                statement.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -46,26 +47,27 @@ public class TradesLog {
             List<Trade> trades = new ArrayList<>();
             String sql = "SELECT * FROM trade_log WHERE uuid = ? ORDER BY id DESC LIMIT " + limit + " OFFSET ?;";
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, uuid.toString());
-            statement.setInt(2, offset);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
+            try(PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, uuid.toString());
+                statement.setInt(2, offset);
+                try(ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
 
-                Trade trade = new Trade(
-                        MarketManager.getInstance().getItem(rs.getString("identifier")),
-                        NormalisedDate.parseDateTime(rs.getString("date")),
-                        rs.getFloat("value"),
-                        rs.getInt("amount"),
-                        rs.getBoolean("buy"),
-                        rs.getBoolean("discord"),
-                        uuid
-                );
+                        Trade trade = new Trade(
+                                MarketManager.getInstance().getItem(rs.getString("identifier")),
+                                NormalisedDate.parseDateTime(rs.getString("date")),
+                                rs.getFloat("value"),
+                                rs.getInt("amount"),
+                                rs.getBoolean("buy"),
+                                rs.getBoolean("discord"),
+                                uuid
+                        );
 
-                trades.add(trade);
+                        trades.add(trade);
+                    }
+                    return trades;
+                }
             }
-            return trades;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -80,27 +82,28 @@ public class TradesLog {
             List<Trade> trades = new ArrayList<>();
             String sql = "SELECT * FROM trade_log WHERE uuid = ? AND identifier = ? ORDER BY id DESC LIMIT " + limit + " OFFSET ?;";
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, uuid.toString());
-            statement.setString(2, item.getIdentifier());
-            statement.setInt(3, offset);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
+            try(PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, uuid.toString());
+                statement.setString(2, item.getIdentifier());
+                statement.setInt(3, offset);
+                try(ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
 
-                Trade trade = new Trade(
-                        MarketManager.getInstance().getItem(rs.getString("identifier")),
-                        NormalisedDate.parseDateTime(rs.getString("date")),
-                        rs.getFloat("value"),
-                        rs.getInt("amount"),
-                        rs.getBoolean("buy"),
-                        rs.getBoolean("discord"),
-                        uuid
-                );
+                        Trade trade = new Trade(
+                                MarketManager.getInstance().getItem(rs.getString("identifier")),
+                                NormalisedDate.parseDateTime(rs.getString("date")),
+                                rs.getFloat("value"),
+                                rs.getInt("amount"),
+                                rs.getBoolean("buy"),
+                                rs.getBoolean("discord"),
+                                uuid
+                        );
 
-                trades.add(trade);
+                        trades.add(trade);
+                    }
+                    return trades;
+                }
             }
-            return trades;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -112,26 +115,27 @@ public class TradesLog {
             List<Trade> trades = new ArrayList<>();
             String sql = "SELECT * FROM trade_log WHERE identifier = ? ORDER BY id DESC LIMIT " + limit + " OFFSET ?;";
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, item.getIdentifier());
-            statement.setInt(2, offset);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
+            try(PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, item.getIdentifier());
+                statement.setInt(2, offset);
+                try(ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
 
-                Trade trade = new Trade(
-                        item,
-                        NormalisedDate.parseDateTime(rs.getString("date")),
-                        rs.getFloat("value"),
-                        rs.getInt("amount"),
-                        rs.getBoolean("buy"),
-                        rs.getBoolean("discord"),
-                        UUID.fromString(rs.getString("uuid"))
-                );
+                        Trade trade = new Trade(
+                                item,
+                                NormalisedDate.parseDateTime(rs.getString("date")),
+                                rs.getFloat("value"),
+                                rs.getInt("amount"),
+                                rs.getBoolean("buy"),
+                                rs.getBoolean("discord"),
+                                UUID.fromString(rs.getString("uuid"))
+                        );
 
-                trades.add(trade);
+                        trades.add(trade);
+                    }
+                    return trades;
+                }
             }
-            return trades;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -143,25 +147,26 @@ public class TradesLog {
             List<Trade> trades = new ArrayList<>();
             String sql = "SELECT * FROM trade_log ORDER BY id DESC LIMIT " + limit + " OFFSET ?;";
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, offset);
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()) {
+            try(PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, offset);
+                try(ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
 
-                Trade trade = new Trade(
-                        MarketManager.getInstance().getItem(rs.getString("identifier")),
-                        NormalisedDate.parseDateTime(rs.getString("date")),
-                        rs.getFloat("value"),
-                        rs.getInt("amount"),
-                        rs.getBoolean("buy"),
-                        rs.getBoolean("discord"),
-                        UUID.fromString(rs.getString("uuid"))
-                );
+                        Trade trade = new Trade(
+                                MarketManager.getInstance().getItem(rs.getString("identifier")),
+                                NormalisedDate.parseDateTime(rs.getString("date")),
+                                rs.getFloat("value"),
+                                rs.getInt("amount"),
+                                rs.getBoolean("buy"),
+                                rs.getBoolean("discord"),
+                                UUID.fromString(rs.getString("uuid"))
+                        );
 
-                trades.add(trade);
+                        trades.add(trade);
+                    }
+                    return trades;
+                }
             }
-            return trades;
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -175,9 +180,10 @@ public class TradesLog {
 
         try {
             String sql = "DELETE FROM trade_log WHERE day<?;";
-            PreparedStatement prep = connection.prepareStatement(sql);
-            prep.setDouble(1, NormalisedDate.getDays() - offset);
-            prep.executeUpdate();
+            try(PreparedStatement prep = connection.prepareStatement(sql)) {
+                prep.setDouble(1, NormalisedDate.getDays() - offset);
+                prep.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
